@@ -32,8 +32,8 @@ node n2 {
 	!
     }
     canvas c1
-    iconcoords {199.0 199.0}
-    labelcoords {199.0 231.0}
+    iconcoords {198.0 198.0}
+    labelcoords {198.0 230.0}
     interface-peer {eth0 n1}
 }
 
@@ -41,7 +41,7 @@ node n3 {
     type router
     model host
     network-config {
-	hostname Client2
+	hostname Cliente2
 	!
 	interface eth0
 	 ip address 192.168.2.10/24
@@ -49,8 +49,8 @@ node n3 {
 	!
     }
     canvas c1
-    iconcoords {720.0 79.0}
-    labelcoords {720.0 111.0}
+    iconcoords {720.0 78.0}
+    labelcoords {720.0 110.0}
     interface-peer {eth0 n1}
 }
 
