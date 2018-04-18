@@ -31,11 +31,8 @@ ip link set veth-ns21br-1 netns ns2.1
 echo "Agrego interfaces a bridge"
 
 brctl addif br-externo veth-ns21br-2
-brctl addif br-externo enp0s3
+brctl addif br-externo enp2s0
 
-#Levanto bridge
-echo "Levanto bridge"
-ip link set dev br-externo up
 
 
 #Muestro informacion de lo anterior.
@@ -47,7 +44,12 @@ ip netns exec ns2.1 ip link
 #Direccionamiento IPv6
 echo "Direccionamiento IPv6"
 ip netns exec ns2.1 ip -6 addr add 2001:aaaa:bbbb:bbb0::21/64 dev veth-ns21br-1
-ip -6 addr add 2001:aaaa:bbbb:bbb0::1/64 dev veth-ns21br-2
+ip -6 addr add 2001:aaaa:bbbb:bbb0::22/64 dev br-externo
+
+#Levanto bridge
+echo "Levanto bridge"
+ip link set dev br-externo up
+
 
 #Cambio de MTU a interfaz de ns2.1 que se dirige al bridge.
 echo "Cambio de MTU"
@@ -161,7 +163,7 @@ ip netns exec ns2.6 route -A inet6 add default gw 2001:aaaa:bbbb:bbb6::24 dev ve
 
 
 #Routers
-ip netns exec ns2.1 route -A inet6 add default gw 2001:aaaa:bbbb:bbb0::1  dev veth-ns21br-1
+ip netns exec ns2.1 route -A inet6 add default gw 2001:aaaa:bbbb:bbb0:0:0:0:20 dev veth-ns21br-1
 ip netns exec ns2.2 route -A inet6 add default gw 2001:aaaa:bbbb:bbb1:0:0:0:21 
 ip netns exec ns2.3 route -A inet6 add 2001:aaaa:bbbb:bbb6:0:0:0:0/64 gw 2001:aaaa:bbbb:bbb4:0:0:0:24
 ip netns exec ns2.3 route -A inet6 add default gw 2001:aaaa:bbbb:bbb2:0:0:0:21 
@@ -171,26 +173,28 @@ ip netns exec ns2.1 route -A inet6 add 2001:aaaa:bbbb:bbb6:0:0:0:0/64 gw 2001:aa
 ip netns exec ns2.1 route -A inet6 add 2001:aaaa:bbbb:bbb5:0:0:0:0/64 gw 2001:aaaa:bbbb:bbb2:0:0:0:23
 ip netns exec ns2.1 route -A inet6 add 2001:aaaa:bbbb:bbb7:0:0:0:0/64 gw 2001:aaaa:bbbb:bbb1:0:0:0:22
 
-echo "Info ruteo"
+echo "Info ruteo 2.1"
 ip netns exec ns2.1 ip -6 route
-ip netns exec ns2.2 ip -6 route 
-ip netns exec ns2.3 ip -6 route 
-ip netns exec ns2.4 ip -6 route
+#ip netns exec ns2.2 ip -6 route 
+#ip netns exec ns2.3 ip -6 route 
+#ip netns exec ns2.4 ip -6 route
 
 #Pings.
 echo "Probando conectividad entre hosts..."
 sleep 10
-ip netns exec ns2.5 ping6 2001:aaaa:bbbb:bbb5::23 -I  veth-ns2325-2 -c 3
-ip netns exec ns2.6 ping6 2001:aaaa:bbbb:bbb6::24 -I  veth-ns2426-2 -c 3
-ip netns exec ns2.1 ping6 2001:aaaa:bbbb:bbb0::1 -I  veth-ns21br-1 -c 3
-ip netns exec ns2.2 ping6 2001:aaaa:bbbb:bbb1::21 -I  veth-ns2122-2 -c 3
-ip netns exec ns2.3 ping6 2001:aaaa:bbbb:bbb2::21 -I  veth-ns2123-2 -c 3
-ip netns exec ns2.3 ping6 2001:aaaa:bbbb:bbb4::24 -I  veth-ns2324-1 -c 3
-ip netns exec ns2.4 ping6 2001:aaaa:bbbb:bbb3::21 -I  veth-ns2124-2 -c 3
-ip netns exec ns2.4 ping6 2001:aaaa:bbbb:bbb5::25 -I  veth-ns2324-2 -c 3
-ip netns exec ns2.5 ping6 2001:aaaa:bbbb:bbb2::21 -I  veth-ns2325-2 -c 3
-ip netns exec ns2.6 ping6 2001:aaaa:bbbb:bbb3::21 -I  veth-ns2426-2 -c 3
-ip netns exec ns2.6 ping6 2001:aaaa:bbbb:bbb5::25 -I  veth-ns2426-2 -c 3
+#ip netns exec ns2.5 ping6 2001:aaaa:bbbb:bbb5::23 -I  veth-ns2325-2 -c 3
+#ip netns exec ns2.6 ping6 2001:aaaa:bbbb:bbb6::24 -I  veth-ns2426-2 -c 3
+ip netns exec ns2.1 ping6 2001:aaaa:bbbb:bbb0::22 -I  veth-ns21br-1 -c 3
+ip netns exec ns2.1 ping6 2001:aaaa:bbbb:bbb0::20 -I  veth-ns21br-1 -c 3
+ip netns exec ns2.1 ping6 2001:aaaa:bbbb:bbb0::10 -I  veth-ns21br-1 -c 3
+#ip netns exec ns2.2 ping6 2001:aaaa:bbbb:bbb1::21 -I  veth-ns2122-2 -c 3
+#ip netns exec ns2.3 ping6 2001:aaaa:bbbb:bbb2::21 -I  veth-ns2123-2 -c 3
+#ip netns exec ns2.3 ping6 2001:aaaa:bbbb:bbb4::24 -I  veth-ns2324-1 -c 3
+#ip netns exec ns2.4 ping6 2001:aaaa:bbbb:bbb3::21 -I  veth-ns2124-2 -c 3
+#ip netns exec ns2.4 ping6 2001:aaaa:bbbb:bbb5::25 -I  veth-ns2324-2 -c 3
+#ip netns exec ns2.5 ping6 2001:aaaa:bbbb:bbb2::21 -I  veth-ns2325-2 -c 3
+#ip netns exec ns2.6 ping6 2001:aaaa:bbbb:bbb3::21 -I  veth-ns2426-2 -c 3
+#ip netns exec ns2.6 ping6 2001:aaaa:bbbb:bbb5::25 -I  veth-ns2426-2 -c 3
 
 
 
