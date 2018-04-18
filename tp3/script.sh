@@ -29,11 +29,14 @@ ip link set veth-ns21br-1 netns ns2.1
 
 #Agrego interfaces a bridge. (enp0s3 y el otro extremo del veth peer).
 echo "Agrego interfaces a bridge"
-brctl addif br-externo veth-ns21br-2 enp0s3
+
+brctl addif br-externo veth-ns21br-2
+brctl addif br-externo enp0s3
 
 #Levanto bridge
 echo "Levanto bridge"
 ip link set dev br-externo up
+
 
 #Muestro informacion de lo anterior.
 echo "Info bridge"
@@ -145,25 +148,34 @@ ip netns exec ns2.2 ip link set up dev veth-ns22lo-1
 
 #IP forwarding de routers.
 echo "IP forwarding en los routers"
-ip netns exec ns2.1 sysctl -w net.ipv4.ip_forward=1
-ip netns exec ns2.2 sysctl -w net.ipv4.ip_forward=1
-ip netns exec ns2.3 sysctl -w net.ipv4.ip_forward=1
-ip netns exec ns2.4 sysctl -w net.ipv4.ip_forward=1
+ip netns exec ns2.1 sysctl -w net.ipv6.conf.all.forwarding=1
+ip netns exec ns2.2 sysctl -w net.ipv6.conf.all.forwarding=1
+ip netns exec ns2.3 sysctl -w net.ipv6.conf.all.forwarding=1
+ip netns exec ns2.4 sysctl -w net.ipv6.conf.all.forwarding=1
 
 #Ruteo estatico
 echo "Ruteo estatico"
-#ip netns exec ns2.2 route add default via 2001:aaaa:bbbb:bbb1:0:0:0:21
-#ip netns exec ns2.3 route add -net6 2001:aaaa:bbbb:bbb6:0:0:0:0 netmask 64 via 2001:aaaa:bbbb:bbb4:0:0:0:24
-#ip netns exec ns2.3 route add default via 2001:aaaa:bbbb:bbb2:0:0:0:21
-#ip netns exec ns2.4 route add -net6 2001:aaaa:bbbb:bbb5:0:0:0:0 netmask 64 via 2001:aaaa:bbbb:bbb4:0:0:0:23
-#ip netns exec ns2.4 route add default via 2001:aaaa:bbbb:bbb3:0:0:0:21
-#ip netns exec ns2.2 route add default via 2001:aaaa:bbbb:bbb1:0:0:0:22
+#Hosts
+ip netns exec ns2.5 route -A inet6 add default gw 2001:aaaa:bbbb:bbb5::23 dev veth-ns2325-2
+ip netns exec ns2.6 route -A inet6 add default gw 2001:aaaa:bbbb:bbb6::24 dev veth-ns2426-2
+
+
+#Routers
+ip netns exec ns2.1 route -A inet6 add default gw 2001:aaaa:bbbb:bbb0::1  dev veth-ns21br-1
+ip netns exec ns2.2 route -A inet6 add default gw 2001:aaaa:bbbb:bbb1:0:0:0:21 
+ip netns exec ns2.3 route -A inet6 add 2001:aaaa:bbbb:bbb6:0:0:0:0/64 gw 2001:aaaa:bbbb:bbb4:0:0:0:24
+ip netns exec ns2.3 route -A inet6 add default gw 2001:aaaa:bbbb:bbb2:0:0:0:21 
+ip netns exec ns2.4 route -A inet6 add 2001:aaaa:bbbb:bbb5:0:0:0:0/64 gw 2001:aaaa:bbbb:bbb4:0:0:0:23
+ip netns exec ns2.4 route -A inet6 add default gw 2001:aaaa:bbbb:bbb3:0:0:0:21
+ip netns exec ns2.1 route -A inet6 add 2001:aaaa:bbbb:bbb6:0:0:0:0/64 gw 2001:aaaa:bbbb:bbb3:0:0:0:24
+ip netns exec ns2.1 route -A inet6 add 2001:aaaa:bbbb:bbb5:0:0:0:0/64 gw 2001:aaaa:bbbb:bbb2:0:0:0:23
+ip netns exec ns2.1 route -A inet6 add 2001:aaaa:bbbb:bbb7:0:0:0:0/64 gw 2001:aaaa:bbbb:bbb1:0:0:0:22
 
 echo "Info ruteo"
-ip netns exec ns2.1 route
-ip netns exec ns2.2 route 
-ip netns exec ns2.3 route 
-ip netns exec ns2.4 route
+ip netns exec ns2.1 ip -6 route
+ip netns exec ns2.2 ip -6 route 
+ip netns exec ns2.3 ip -6 route 
+ip netns exec ns2.4 ip -6 route
 
 #Pings.
 echo "Probando conectividad entre hosts..."
@@ -173,9 +185,12 @@ ip netns exec ns2.6 ping6 2001:aaaa:bbbb:bbb6::24 -I  veth-ns2426-2 -c 3
 ip netns exec ns2.1 ping6 2001:aaaa:bbbb:bbb0::1 -I  veth-ns21br-1 -c 3
 ip netns exec ns2.2 ping6 2001:aaaa:bbbb:bbb1::21 -I  veth-ns2122-2 -c 3
 ip netns exec ns2.3 ping6 2001:aaaa:bbbb:bbb2::21 -I  veth-ns2123-2 -c 3
+ip netns exec ns2.3 ping6 2001:aaaa:bbbb:bbb4::24 -I  veth-ns2324-1 -c 3
 ip netns exec ns2.4 ping6 2001:aaaa:bbbb:bbb3::21 -I  veth-ns2124-2 -c 3
+ip netns exec ns2.4 ping6 2001:aaaa:bbbb:bbb5::25 -I  veth-ns2324-2 -c 3
 ip netns exec ns2.5 ping6 2001:aaaa:bbbb:bbb2::21 -I  veth-ns2325-2 -c 3
 ip netns exec ns2.6 ping6 2001:aaaa:bbbb:bbb3::21 -I  veth-ns2426-2 -c 3
+ip netns exec ns2.6 ping6 2001:aaaa:bbbb:bbb5::25 -I  veth-ns2426-2 -c 3
 
 
 
