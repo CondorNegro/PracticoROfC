@@ -1,0 +1,101 @@
+#Se especifica que se va a utilizar la version 2.1 de docker compose file
+#Referencia a https://docs.docker.com/compose/compose-file/compose-file-v2/
+version: '2.1'
+
+#Indico que voy a crear servicios
+services:
+
+#Nombro a mis servicios
+  r1:
+  
+  #Se utiliza para indicar donde está el Dockerfile que queremos utilizar para crear el contenedor. 
+  #Al poner “.” automaticamente considerará el Dockerfile existene en directorio actual.
+    build: .
+    
+    #Aqui hacemos que el directorio actual se mapee directamente con los directorios listados.
+    #De este modo, cualquier cambio en el directorio local en el host, se hará de inmediato en el contenedor.
+    volumes:
+      - ./volumes/quagga/r1/zebra.conf:/etc/quagga/zebra.conf:ro
+      - ./volumes/quagga/r1/ospfd.conf:/etc/quagga/ospfd.conf:ro
+      - ./volumes/quagga/r1/ospf6d.conf:/etc/quagga/ospf6d.conf:ro
+      - ./volumes/supervisord.conf:/etc/supervisor/conf.d/supervisord.conf:ro
+    
+    #Crea una imagen llamada "ospf" en el directorio especificado en build
+    image: ospf:20180419
+    
+    #Indico que se van a requerir privelegios de administrador
+    privileged: true
+    
+    #Mapeo los siguientes puertos de la forma HOST:CONTAINER
+    ports:
+      #admin
+      - 10011:2601
+      #ospf
+      - 10012:2604
+      #ospf ipv6
+      - 10013:2606
+    
+    #Asigno las direcciones ipv4 e ipv6 al container
+    networks:
+      oam:
+        ipv4_address: 192.168.0.11
+        ipv6_address: 2001::11
+      nr1:
+        ipv4_address: 172.16.1.11
+        ipv6_address: 2001:aaaa:aaaa::11
+   
+   
+  ##Se aplican los mismos comentarios sobre r2
+  r2:
+    build: .
+    volumes:
+      - ./volumes/quagga/r2/zebra.conf:/etc/quagga/zebra.conf:ro
+      - ./volumes/quagga/r2/ospfd.conf:/etc/quagga/ospfd.conf:ro
+      - ./volumes/quagga/r2/ospf6d.conf:/etc/quagga/ospf6d.conf:ro
+      - ./volumes/supervisord.conf:/etc/supervisor/conf.d/supervisord.conf:ro
+    image: ospf:20180419
+    privileged: true
+    ports:
+      #admin
+      - 10021:2601
+      #ospf
+      - 10022:2604
+      #ospf ipv6
+      - 10023:2606
+    networks:
+      oam:
+        ipv4_address: 192.168.0.12
+        ipv6_address: 2001::12
+      nr2:
+        ipv4_address: 172.16.2.12
+        ipv6_address: 2001:bbbb:bbbb::11
+
+#Define la red a la cual pertenece la red estatica
+networks:
+  
+  oam:  
+    #Usamos bridge para poder conectar los dockers en el host.
+    driver: "bridge"
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.0.0/24
+        - subnet: 2001::/64
+  nr1:
+    driver: "bridge"
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.1.0/24
+        - subnet: 2001:aaaa:aaaa::/64
+  nr2:
+    driver: "bridge"
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.2.0/24
+        - subnet: 2001:bbbb:bbbb::/64
+
