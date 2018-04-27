@@ -288,26 +288,26 @@ services:
 
 
 
-    ##Se aplican los mismos comentarios sobre r8
-    h14:
-        build: .
-        volumes:
-          - ./volumes/quagga/h14/zebra.conf:/etc/quagga/zebra.conf:ro
-          - ./volumes/quagga/h14/ospfd.conf:/etc/quagga/ospfd.conf:ro
-          - ./volumes/quagga/h14/ospf6d.conf:/etc/quagga/ospf6d.conf:ro
-          - ./volumes/supervisord.conf:/etc/supervisor/conf.d/supervisord.conf:ro
-        image: ospf:20180419
-        privileged: true
-        ports:
-          #admin
-          - 10141:2601
-          #ospf
-          - 10142:2604
-          #ospf ipv6
-          - 10143:2606
-        networks:
-            r8_h14:
-              ipv6_address: 2001:b814::14
+  ##Se aplican los mismos comentarios sobre r8
+  h14:
+      build: .
+      volumes:
+        - ./volumes/quagga/h14/zebra.conf:/etc/quagga/zebra.conf:ro
+        - ./volumes/quagga/h14/ospfd.conf:/etc/quagga/ospfd.conf:ro
+        - ./volumes/quagga/h14/ospf6d.conf:/etc/quagga/ospf6d.conf:ro
+        - ./volumes/supervisord.conf:/etc/supervisor/conf.d/supervisord.conf:ro
+      image: ospf:20180419
+      privileged: true
+      ports:
+        #admin
+        - 20141:2601
+        #ospf
+        - 20142:2604
+        #ospf ipv6
+        - 20143:2606
+      networks:
+          r8_h14:
+            ipv6_address: 2001:b814::14
 
 
 
