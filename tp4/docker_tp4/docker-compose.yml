@@ -38,7 +38,7 @@ services:
     #Asigno las direcciones ipv4 e ipv6 al container
     networks:
       r1_r2:
-        ipv6_address: 2001::11
+        ipv6_address: 2001::28
       r3_r1:
         ipv6_address: 2001:aa31::11
       r5_r1:
