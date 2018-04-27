@@ -40,11 +40,11 @@ services:
       r1_r2:
         ipv6_address: 2001::11
       r3_r1:
-        ipv6_address: 2001:aa31::1
+        ipv6_address: 2001:aa31::11
       r5_r1:
-        ipv6_address: 2001:aa51::1
+        ipv6_address: 2001:aa51::11
       r7_r1:
-        ipv6_address: 2001:aa71::1
+        ipv6_address: 2001:aa71::11
 
 
   ##Se aplican los mismos comentarios sobre r2
