@@ -2,18 +2,18 @@
 #Referencia a https://docs.docker.com/compose/compose-file/compose-file-v2/
 version: '2.1'
 
-#Indico que voy a crear servicios
+#Se indica que se crean servicios
 services:
 
-#Nombro a mis servicios
+#Se nombra a los servicios
   r1:
 
-  #Se utiliza para indicar donde está el Dockerfile que queremos utilizar para crear el contenedor.
-  #Al poner “.” automaticamente considerará el Dockerfile existene en directorio actual.
+  #Se utiliza para indicar donde esta el Dockerfile que se quiere utilizar para crear el contenedor.
+  #Al poner “.” automaticamente considerara el Dockerfile existene en directorio actual.
     build: .
 
-    #Aqui hacemos que el directorio actual se mapee directamente con los directorios listados.
-    #De este modo, cualquier cambio en el directorio local en el host, se hará de inmediato en el contenedor.
+    #Aqui se hace que el directorio actual se mapee directamente con los directorios listados.
+    #De este modo, cualquier cambio en el directorio local en el host, se hara de inmediato en el contenedor.
     volumes:
       - ./volumes/quagga/r1/zebra.conf:/etc/quagga/zebra.conf:ro
       - ./volumes/quagga/r1/ospfd.conf:/etc/quagga/ospfd.conf:ro
@@ -23,10 +23,10 @@ services:
     #Crea una imagen llamada "ospf" en el directorio especificado en build
     image: ospf:20180419
 
-    #Indico que se van a requerir privelegios de administrador
+    #Indica que se van a requerir privelegios de administrador
     privileged: true
 
-    #Mapeo los siguientes puertos de la forma HOST:CONTAINER
+    #Se mapean los siguientes puertos de la forma HOST:CONTAINER
     ports:
       #admin
       - 20011:2601
@@ -35,7 +35,7 @@ services:
       #ospf ipv6
       - 20013:2606
 
-    #Asigno las direcciones ipv4 e ipv6 al container
+    #Se asignan las direcciones ipv4 e ipv6 al container
     networks:
       r1_r2:
         ipv6_address: 2001::28
@@ -318,11 +318,11 @@ services:
 
 
 
-#Define la red a la cual pertenece la red estatica
+#Se definen los enlaces y las redes a las cuales pertenecen
 networks:
 
   r1_r2:
-    #Usamos bridge para poder conectar los dockers en el host.
+    #Se usa bridge como driver para poder conectar los dockers en el host.
     driver: "bridge"
     enable_ipv6: true
     ipam:
