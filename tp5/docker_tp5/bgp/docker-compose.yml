@@ -5,7 +5,7 @@ version: '2.1'
 #Se indica que se crean servicios
 services:
 #Se nombra a los servicios
-#b1 y b2 son routers de borde de SA. 
+#b1, b2 y b3 son routers de borde de SA. 
   b1:
     #Se utiliza para indicar donde esta el Dockerfile que se quiere utilizar para crear el contenedor.
     build: ./bgp/.
@@ -56,6 +56,36 @@ services:
       nr2b2:
         ipv6_address: 2001:bbbb:bbbb::6
  
+  b3:
+    #Se utiliza para indicar donde esta el Dockerfile que se quiere utilizar para crear el contenedor.
+    build: ./bgp/.
+    #Aqui se hace que el directorio actual se mapee directamente con los directorios listados.
+    #De este modo, cualquier cambio en el directorio local en el host, se hara de inmediato en el contenedor.
+    volumes:
+      - ./volumes/bgp/b3/zebra.conf:/etc/quagga/zebra.conf:ro
+      - ./volumes/bgp/b3/ospf6d.conf:/etc/quagga/ospf6d.conf:ro
+      - ./volumes/bgp/b3/bgpd.conf:/etc/quagga/bgpd.conf:ro
+      - ./volumes/bgp/supervisord.conf:/etc/supervisor/conf.d/supervisord.conf:ro
+    #Crea una imagen llamada "bgp" en el directorio especificado en build
+    image: bgp:20180426
+    #Indica que se van a requerir privelegios de administrador
+    privileged: true
+    #Se mapean los siguientes puertos de la forma HOST:CONTAINER
+    ports:
+      #admin
+      - 10301:2601
+      #ospf ipv6
+      - 10303:2606
+      #bgp
+      - 10304:2605
+    #Se asignan las direcciones ipv4 e ipv6 al container 
+    networks:
+      b1_b2:
+        ipv6_address: 2001::5
+      b1_b3:
+        
+      nr1b1:
+        ipv6_address: 2001:aaaa:aaaa::5
   #r1 y r2 no hablan el protocolo BGP debido a que no son routers de borde de SA.
   r1:
     build: ./ospf/.

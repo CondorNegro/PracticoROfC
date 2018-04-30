@@ -13,3 +13,7 @@ echo "Creo containers."
 
 
 docker-compose up
+
+
+
+
