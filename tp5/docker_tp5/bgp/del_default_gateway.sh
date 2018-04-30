@@ -3,6 +3,10 @@
 
 echo "Borro default gateways asignados por Docker"
 
+docker exec -it bgp_h11_1 ip -6 route del fe80::/64 dev eth0
+docker exec -it bgp_h12_1 ip -6 route del fe80::/64 dev eth0
+docker exec -it bgp_h13_1 ip -6 route del fe80::/64 dev eth0
+docker exec -it bgp_h14_1 ip -6 route del fe80::/64 dev eth0
 docker exec -it bgp_r3_1 ip -6 route del fe80::/64 dev eth0
 docker exec -it bgp_r3_1 ip -6 route del fe80::/64 dev eth1
 docker exec -it bgp_r4_1 ip -6 route del fe80::/64 dev eth0
