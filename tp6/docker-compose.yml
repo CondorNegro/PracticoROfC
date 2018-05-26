@@ -1,0 +1,14 @@
+version: '2'
+services:
+  bind:
+    restart: always
+    image: sameersbn/bind:latest
+    volumes:
+    - /srv/docker/bind:/data
+    privileged: true
+    dns: 127.0.0.1
+    environment:
+    - 'ROOT_PASSWORD=ubuntu'
+    ports:
+    - 10000:10000/tcp
+    - 53:53/udp
